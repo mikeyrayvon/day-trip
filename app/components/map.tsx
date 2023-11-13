@@ -22,9 +22,11 @@ const convertSizes = (width: number, height: number): [number, number] => {
 const Map = ({
   userLocation,
   voidStats,
+  addLogs,
 }: {
   userLocation?: LatLon;
   voidStats?: Stats;
+  addLogs: (log: string | string[]) => void;
 }) => {
   const [mapUrl, setMapUrl] = useState("");
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -46,7 +48,7 @@ const Map = ({
 
   return (
     <div
-      className="relative w-full h-full bg-center bg-cover bg-zinc-700"
+      className="absolute top-0 left-0 w-full h-[80%] bg-center bg-cover bg-zinc-700"
       style={{ backgroundImage: `url(${mapUrl})` }}
       ref={mapRef}
     ></div>
