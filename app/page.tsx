@@ -80,7 +80,7 @@ const Home = () => {
         voidStats={voidStats}
         addLogs={addLogs}
       />
-      <div className="flex gap-1 absolute top-0 w-full z-[1000] justify-center py-2 pointer-events-none">
+      <div className="flex gap-1 absolute bottom-[20%] w-full z-[1000] justify-end py-2 pointer-events-none pr-4">
         <button
           onClick={() => handleSubmit(1000)}
           disabled={loading || !userLocation}
@@ -111,7 +111,7 @@ const Home = () => {
         className="absolute bottom-0 left-0 w-full h-[20%] overflow-x-hidden overflow-y-scroll"
         ref={logsRef}
       >
-        <div className="flex flex-col justify-end items-start p-1">
+        <div className="flex flex-col justify-end items-start p-1 text-xs">
           {logs.map((log, i) => (
             <div key={`log-${i}`}>
               <span>{log}</span>
