@@ -6,22 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "ngrok": "ngrok http 3000"
   },
   "dependencies": {
+    "@tunnel/cli": "^0.4.5",
+    "axios": "^1.6.1",
+    "crypto": "^1.0.1",
+    "fatum-node": "github:mikeyrayvon/fatum-node",
+    "leaflet": "^1.9.4",
+    "leaflet-defaulticon-compatibility": "^0.1.2",
+    "next": "14.0.2",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.0.2"
+    "react-leaflet": "^4.2.1"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/leaflet": "^1.9.8",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.2",
+    "ngrok": "^5.0.0-beta.2",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
-    "eslint": "^8",
-    "eslint-config-next": "14.0.2"
+    "typescript": "^5"
   }
 }
