@@ -30,7 +30,7 @@ export default async function handler(
       success: boolean;
     } = await axios.get("https://api.quantumnumbers.anu.edu.au", {
       headers: {
-        "x-api-key": process.env.API_KEY,
+        "x-api-key": process.env.NEXT_PUBLIC_QRNG_API_KEY,
       },
       params: {
         length: 1024,
