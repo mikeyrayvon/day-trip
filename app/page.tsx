@@ -55,8 +55,12 @@ const Home = () => {
   const handleSubmit = async (radius = 1000) => {
     setLoading(true);
     addLogs(["getting void", `radius: ${radius}`]);
-    const newVoid = await getVoid(userLocation as LatLon, radius);
+    const { stats: newVoid, message } = await getVoid(
+      userLocation as LatLon,
+      radius
+    );
     addLogs([
+      message,
       "void acquired",
       `void latlon: ${newVoid.coordinate.lat},${newVoid.coordinate.lon}`,
       `void radius: ${newVoid.radius}`,

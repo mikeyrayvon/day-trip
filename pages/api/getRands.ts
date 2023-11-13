@@ -4,6 +4,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 type ResponseData = {
   rands: number[];
+  message: string;
+};
+
+const messages = {
+  quantum: "quantum random number set acquired",
+  pseudo: "pseudo random number set acquired",
 };
 
 export default async function handler(
@@ -11,7 +17,10 @@ export default async function handler(
   res: NextApiResponse<ResponseData>
 ) {
   if (process.env.NODE_ENV === "development") {
-    res.status(200).json({ rands: Array.from(randomBytes(1024).values()) });
+    res.status(200).json({
+      rands: Array.from(randomBytes(1024).values()),
+      message: messages.pseudo,
+    });
   }
   try {
     const qrnd: {
@@ -29,8 +38,14 @@ export default async function handler(
       },
       timeout: 2000,
     });
-    res.status(200).json({ rands: qrnd.data });
+    res.status(200).json({
+      rands: qrnd.data,
+      message: messages.quantum,
+    });
   } catch (e: any) {
-    res.status(200).json({ rands: Array.from(randomBytes(1024).values()) });
+    res.status(200).json({
+      rands: Array.from(randomBytes(1024).values()),
+      message: messages.pseudo,
+    });
   }
 }

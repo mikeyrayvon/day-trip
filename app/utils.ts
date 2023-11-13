@@ -8,11 +8,13 @@ const MIN_P = 100;
 const MIN_P_RADIUS = 50;
 
 let rands: number[] = [];
+let message: "";
 
 async function guaranteeBuffer() {
   if (rands.length < 300) {
     const res = await axios("api/getRands");
     rands = rands.concat(res.data.rands);
+    message = res.data.message;
   }
 }
 
@@ -191,7 +193,10 @@ export async function getAttractor(
   return getStats(avgCoord, fullBag, radius);
 }
 
-export async function getVoid(center: LatLon, radius: number): Promise<Stats> {
+export async function getVoid(
+  center: LatLon,
+  radius: number
+): Promise<{ stats: Stats; message: string }> {
   const fullBag = await fillPointsBag(center, radius);
   console.log(fullBag);
   let mirCoord: LatLon = center,
@@ -213,7 +218,7 @@ export async function getVoid(center: LatLon, radius: number): Promise<Stats> {
     center = mirCoord; // reset "center" for next iteration
   }
   const stats = getStats(mirCoord, fullBag, radius);
-  return { ...stats, ...{ power: 1 / stats.power } };
+  return { stats: { ...stats, ...{ power: 1 / stats.power } }, message };
 }
 
 export async function* takeCoordinate(
