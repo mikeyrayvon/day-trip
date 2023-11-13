@@ -71,7 +71,7 @@ const Home = () => {
   };
 
   const buttonStyle =
-    "py-1 px-2 border border-zinc-400 rounded-md disabled:bg-zinc-500 disabled:border-0 disabled:text-zinc-400 pointer-events-auto";
+    "py-1 px-2 border border-zinc-400 rounded-md disabled:bg-zinc-500 disabled:border-0 disabled:text-zinc-400";
 
   return (
     <main className="w-full h-full fixed text-white bg-zinc-700">
@@ -80,32 +80,44 @@ const Home = () => {
         voidStats={voidStats}
         addLogs={addLogs}
       />
-      <div className="flex gap-1 absolute bottom-[20%] w-full z-[1000] justify-end py-2 pointer-events-none pr-4">
-        <button
-          onClick={() => handleSubmit(1000)}
-          disabled={loading || !userLocation}
-          className={buttonStyle + " bg-zinc-700"}
-        >
-          ⦰1000m
-        </button>
-        <button
-          onClick={() => handleSubmit(2000)}
-          disabled={loading || !userLocation}
-          className={buttonStyle + " bg-zinc-700"}
-        >
-          ⦰2000m
-        </button>
-        <button
-          onClick={() =>
-            window.location.assign(
-              `https://www.google.com/maps/search/?api=1&query=${voidStats?.coordinate.lat},${voidStats?.coordinate.lon}`
-            )
-          }
-          disabled={loading || !voidStats?.coordinate}
-          className={buttonStyle + " bg-zinc-900"}
-        >
-          gMaps↗
-        </button>
+      <div className="flex absolute bottom-[20%] w-full z-[1000] justify-between items-center py-2 px-4">
+        <div>
+          {process.env.NEXT_PUBLIC_INFO_URL && (
+            <a
+              href={process.env.NEXT_PUBLIC_INFO_URL}
+              className={buttonStyle + " bg-zinc-700 block"}
+            >
+              ?
+            </a>
+          )}
+        </div>
+        <div className="flex gap-1">
+          <button
+            onClick={() => handleSubmit(1000)}
+            disabled={loading || !userLocation}
+            className={buttonStyle + " bg-zinc-700"}
+          >
+            ⦰1000m
+          </button>
+          <button
+            onClick={() => handleSubmit(2000)}
+            disabled={loading || !userLocation}
+            className={buttonStyle + " bg-zinc-700"}
+          >
+            ⦰2000m
+          </button>
+          <button
+            onClick={() =>
+              window.location.assign(
+                `https://www.google.com/maps/search/?api=1&query=${voidStats?.coordinate.lat},${voidStats?.coordinate.lon}`
+              )
+            }
+            disabled={loading || !voidStats?.coordinate}
+            className={buttonStyle + " bg-zinc-900"}
+          >
+            gMaps↗
+          </button>
+        </div>
       </div>
       <div
         className="absolute bottom-0 left-0 w-full h-[20%] overflow-x-hidden overflow-y-scroll"
