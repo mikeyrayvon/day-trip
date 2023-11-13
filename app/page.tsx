@@ -67,7 +67,7 @@ const Home = () => {
   };
 
   const buttonStyle =
-    "py-1 px-2 border border-zinc-400 rounded-md bg-zinc-700 disabled:bg-zinc-500 disabled:border-0 disabled:text-zinc-400 pointer-events-auto";
+    "py-1 px-2 border border-zinc-400 rounded-md disabled:bg-zinc-500 disabled:border-0 disabled:text-zinc-400 pointer-events-auto";
 
   return (
     <main className="w-full h-full fixed text-white bg-zinc-700">
@@ -80,14 +80,14 @@ const Home = () => {
         <button
           onClick={() => handleSubmit(1000)}
           disabled={loading || !userLocation}
-          className={buttonStyle}
+          className={buttonStyle + " bg-zinc-700"}
         >
           ⦰1000m
         </button>
         <button
           onClick={() => handleSubmit(2000)}
           disabled={loading || !userLocation}
-          className={buttonStyle}
+          className={buttonStyle + " bg-zinc-700"}
         >
           ⦰2000m
         </button>
@@ -98,9 +98,9 @@ const Home = () => {
             )
           }
           disabled={loading || !voidStats?.coordinate}
-          className={buttonStyle}
+          className={buttonStyle + " bg-zinc-900"}
         >
-          Open
+          gMaps↗
         </button>
       </div>
       <div
