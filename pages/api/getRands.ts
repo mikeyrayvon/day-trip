@@ -24,7 +24,7 @@ const eth = {
   },
 };
 
-const api = anu;
+const api = eth;
 
 const messages = {
   quantum: 'quantum random number set acquired',
