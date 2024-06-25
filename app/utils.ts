@@ -12,7 +12,6 @@ let message: '';
 async function guaranteeBuffer() {
   if (rands.length < 300) {
     const res = await axios('api/getRands');
-    console.log(res);
     rands = rands.concat(res.data.rands);
     message = res.data.message;
   }
@@ -158,7 +157,6 @@ function getStats(
   const nrad = sorted.filter((d) => d <= arad).length;
   const power =
     (nrad * Math.pow(radius, 2)) / (pointsBag.length * Math.pow(arad, 2));
-  // console.log(`(${nrad} * Math.pow(${radius}, 2)) / (${pointsBag.length} * Math.pow(${arad}, 2))`);
 
   return {
     coordinate: { lat: attractor.lat, lon: attractor.lon },
@@ -176,7 +174,6 @@ export async function getAttractor(
     rd = radius,
     bag = Array.from(fullBag);
 
-  console.log('get attractor');
   // Step the test radius down 1 meter per iteration
   while (--rd > MIN_P_RADIUS && bag.length > 1) {
     avgCoord = getAverageCoordinate(bag);
@@ -196,12 +193,10 @@ export async function getVoid(
   radius: number,
 ): Promise<{ stats: Stats; message: string }> {
   const fullBag = await fillPointsBag(center, radius);
-  console.log(fullBag);
   let mirCoord: LatLon = center,
     rd = radius,
     bag = Array.from(fullBag);
 
-  console.log('get void');
   while (--rd > MIN_P_RADIUS && bag.length > 1) {
     mirCoord = getMirrorCoordinate(center, getAverageCoordinate(bag));
     rd = rd - getDistance(mirCoord, center);

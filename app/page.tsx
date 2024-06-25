@@ -36,11 +36,11 @@ const HomePage = () => {
     fetchData();
   }, [supabase, router]);
 
-  const handleSubmit = async (radius = 1000) => {
+  const handleSubmit = async (radius = 1000, startLocation: LatLon) => {
     setLoading(true);
     addLogs(['getting void', `radius: ${radius}`]);
     const { stats: newVoid, message } = await getVoid(
-      userLocation as LatLon,
+      startLocation ?? (userLocation as LatLon),
       radius,
     );
     addLogs([
@@ -56,23 +56,32 @@ const HomePage = () => {
 
   const getUserLocation = () => {
     if (!('geolocation' in navigator)) {
-      return;
+      return Promise.reject('Geolocation is not supported');
     }
 
     setLoading(true);
     addLogs(['enableHighAccuracy: false', 'timeout: 5000', 'maximumAge: 0']);
 
     // Retrieve latitude & longitude coordinates from `navigator.geolocation` Web API
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const { latitude, longitude } = coords;
-        addLogs(['device acquired', `device latlon: ${latitude},${longitude}`]);
-        setUserLocation({ lat: latitude, lon: longitude });
-        setLoading(false);
-      },
-      (e: any) => console.error(e),
-      { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 },
-    );
+    return new Promise<LatLon>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          const { latitude, longitude } = coords;
+          addLogs([
+            'device acquired',
+            `device latlon: ${latitude},${longitude}`,
+          ]);
+          setUserLocation({ lat: latitude, lon: longitude });
+          setLoading(false);
+          resolve({ lat: latitude, lon: longitude });
+        },
+        (e: any) => {
+          setLoading(false);
+          reject(e);
+        },
+        { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 },
+      );
+    });
   };
 
   return (
@@ -90,27 +99,30 @@ const HomePage = () => {
           )}
         </div>
         <div className="flex gap-1">
-          <button
-            onClick={getUserLocation}
-            disabled={loading}
-            className="button bg-zinc-700"
-          >
-            Get Location
-          </button>
-          <button
-            onClick={() => handleSubmit(1000)}
-            disabled={loading || !userLocation}
-            className="button bg-zinc-700"
-          >
-            ⦰1000m
-          </button>
-          <button
-            onClick={() => handleSubmit(2000)}
-            disabled={loading || !userLocation}
-            className="button bg-zinc-700"
-          >
-            ⦰2000m
-          </button>
+          {!userLocation ? (
+            <button
+              onClick={getUserLocation}
+              disabled={loading}
+              className="button bg-zinc-700"
+            >
+              Start
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => {
+                  getUserLocation().then((startLocation) => {
+                    handleSubmit(1000, startLocation);
+                  });
+                }}
+                disabled={loading}
+                className="button bg-zinc-700"
+              >
+                Generate
+              </button>
+            </>
+          )}
+
           <button
             onClick={() =>
               window.location.assign(

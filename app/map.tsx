@@ -53,7 +53,7 @@ const Map = ({
 
   return (
     <div
-      className="absolute left-0 top-0 h-[80%] w-full bg-zinc-700 bg-cover bg-center"
+      className="absolute left-0 top-0 h-[80%] w-full bg-zinc-800 bg-cover bg-center"
       style={{ backgroundImage: `url(${mapUrl})` }}
       ref={mapRef}
     ></div>

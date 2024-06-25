@@ -35,12 +35,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>,
 ) {
-  if (process.env.NODE_ENV === 'development') {
+  /*if (process.env.NODE_ENV === 'development') {
     res.status(200).json({
       rands: Array.from(randomBytes(1024).values()),
       message: messages.pseudo,
     });
-  }
+  }*/
   try {
     const qrnd: {
       data: {
