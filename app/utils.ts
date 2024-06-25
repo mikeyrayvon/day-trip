@@ -1,6 +1,5 @@
-import axios from "axios";
-import { randomBytes } from "crypto";
-import { Coord, LatLon, Stats } from "./types";
+import axios from 'axios';
+import { Coord, LatLon, Stats } from './types';
 
 const EARTH_RADIUS = 6371000;
 const RADN = (EARTH_RADIUS * Math.PI) / 180;
@@ -8,11 +7,12 @@ const MIN_P = 100;
 const MIN_P_RADIUS = 50;
 
 let rands: number[] = [];
-let message: "";
+let message: '';
 
 async function guaranteeBuffer() {
   if (rands.length < 300) {
-    const res = await axios("api/getRands");
+    const res = await axios('api/getRands');
+    console.log(res);
     rands = rands.concat(res.data.rands);
     message = res.data.message;
   }
@@ -92,10 +92,10 @@ function getAzimuth(center: LatLon, target: LatLon) {
 function getAverageCoordinate(pointsBag: Coord[]): LatLon {
   const avg = pointsBag.reduce(
     (a, coord) => {
-      const [lat, lon] = coord.split(":");
+      const [lat, lon] = coord.split(':');
       return { lat: a.lat + Number(lat), lon: a.lon + Number(lon) };
     },
-    { lat: 0, lon: 0 }
+    { lat: 0, lon: 0 },
   );
   return {
     lat: avg.lat / pointsBag.length,
@@ -136,10 +136,10 @@ async function fillPointsBag(center: LatLon, radius: number): Promise<Coord[]> {
 function getStats(
   attractor: LatLon,
   pointsBag: Coord[],
-  radius: number
+  radius: number,
 ): Stats {
   const distances = pointsBag.map((coord) => {
-    const [plat, plon] = coord.split(":");
+    const [plat, plon] = coord.split(':');
     return getDistance(attractor, { lat: Number(plat), lon: Number(plon) });
   });
   const sorted = distances.slice(0, distances.length).sort((a, b) => a - b);
@@ -158,9 +158,7 @@ function getStats(
   const nrad = sorted.filter((d) => d <= arad).length;
   const power =
     (nrad * Math.pow(radius, 2)) / (pointsBag.length * Math.pow(arad, 2));
-  console.log(
-    `(${nrad} * Math.pow(${radius}, 2)) / (${pointsBag.length} * Math.pow(${arad}, 2))`
-  );
+  // console.log(`(${nrad} * Math.pow(${radius}, 2)) / (${pointsBag.length} * Math.pow(${arad}, 2))`);
 
   return {
     coordinate: { lat: attractor.lat, lon: attractor.lon },
@@ -171,19 +169,19 @@ function getStats(
 
 export async function getAttractor(
   center: LatLon,
-  radius: number
+  radius: number,
 ): Promise<Stats> {
   const fullBag = await fillPointsBag(center, radius);
   let avgCoord: LatLon = center,
     rd = radius,
     bag = Array.from(fullBag);
 
-  console.log("get attractor");
+  console.log('get attractor');
   // Step the test radius down 1 meter per iteration
   while (--rd > MIN_P_RADIUS && bag.length > 1) {
     avgCoord = getAverageCoordinate(bag);
     bag = bag.filter((v) => {
-      const [plat, plon] = v.split(":");
+      const [plat, plon] = v.split(':');
       return (
         getDistance(avgCoord, { lat: Number(plat), lon: Number(plon) }) <= rd
       );
@@ -195,7 +193,7 @@ export async function getAttractor(
 
 export async function getVoid(
   center: LatLon,
-  radius: number
+  radius: number,
 ): Promise<{ stats: Stats; message: string }> {
   const fullBag = await fillPointsBag(center, radius);
   console.log(fullBag);
@@ -203,13 +201,13 @@ export async function getVoid(
     rd = radius,
     bag = Array.from(fullBag);
 
-  console.log("get void");
+  console.log('get void');
   while (--rd > MIN_P_RADIUS && bag.length > 1) {
     mirCoord = getMirrorCoordinate(center, getAverageCoordinate(bag));
     rd = rd - getDistance(mirCoord, center);
 
     bag = bag.filter((v) => {
-      const [plat, plon] = v.split(":");
+      const [plat, plon] = v.split(':');
       return (
         getDistance(mirCoord, { lat: Number(plat), lon: Number(plon) }) <= rd
       );
@@ -223,7 +221,7 @@ export async function getVoid(
 
 export async function* takeCoordinate(
   { lat, lon }: { lat: number; lon: number },
-  radius: number
+  radius: number,
 ): AsyncGenerator<LatLon> {
   const latBase = lat + (radius * -1) / RADN;
   const dLat = (lat + radius / RADN - latBase) * 1000000;
