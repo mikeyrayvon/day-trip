@@ -14,5 +14,5 @@ export const useResizeObserver = ({
     });
     resizeObserver.observe(logsRef.current.firstElementChild);
     return () => resizeObserver.disconnect(); // clean up
-  }, []);
+  }, [logsRef]);
 };
