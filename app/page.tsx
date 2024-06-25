@@ -77,11 +77,7 @@ const HomePage = () => {
 
   return (
     <main className="fixed h-full w-full bg-zinc-700 text-white">
-      <Map
-        userLocation={userLocation}
-        voidStats={voidStats}
-        addLogs={addLogs}
-      />
+      <Map userLocation={userLocation} voidStats={voidStats} />
       <div className="absolute bottom-[20%] z-[1000] flex w-full items-center justify-between px-4 py-2">
         <div>
           {process.env.NEXT_PUBLIC_INFO_URL && (

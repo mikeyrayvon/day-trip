@@ -3,8 +3,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { LatLon, Stats } from './types';
 
-const concatMarker = (url: string, color = 'blue', latlon?: LatLon) =>
-  latlon ? `${url}&markers=color:${color}%7C${latlon.lat},${latlon.lon}` : url;
+const concatMarker = (
+  url: string,
+  color = 'blue',
+  label = 'A',
+  latlon?: LatLon,
+) =>
+  latlon
+    ? `${url}&markers=color:${color}%7Clabel:${label}%7C${latlon.lat},${latlon.lon}`
+    : url;
 const convertRange = (value: number, r1: number, r2: number) => {
   return Math.round((value * r2) / r1);
 };
@@ -22,11 +29,9 @@ const convertSizes = (width: number, height: number): [number, number] => {
 const Map = ({
   userLocation,
   voidStats,
-  addLogs,
 }: {
   userLocation?: LatLon;
   voidStats?: Stats;
-  addLogs: (log: string | string[]) => void;
 }) => {
   const [mapUrl, setMapUrl] = useState('');
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -41,8 +46,8 @@ const Map = ({
     );
     const size = `${convertedSizes[0]}x${convertedSizes[1]}`;
     let url = `https://maps.googleapis.com/maps/api/staticmap?&maptype=satellite&key=${process.env.NEXT_PUBLIC_GMAPS_API_KEY}&size=${size}&scale=2`;
-    url = concatMarker(url, 'blue', userLocation);
-    url = concatMarker(url, 'red', voidStats?.coordinate);
+    url = concatMarker(url, 'blue', 'A', userLocation);
+    url = concatMarker(url, 'red', 'B', voidStats?.coordinate);
     setMapUrl(url);
   }, [userLocation, voidStats?.coordinate]);
 
