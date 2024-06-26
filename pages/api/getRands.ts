@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { randomBytes } from 'crypto';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { headers } from 'next/headers';
 
 type ResponseData = {
   rands: number[];
@@ -13,18 +14,10 @@ const anu = {
     type: 'uint8',
     length: 1024,
   },
-};
-
-const eth = {
-  endpoint: 'http://random.openqu.org/api/randint',
-  params: {
-    min: 0,
-    max: 255,
-    size: 1024,
+  headers: {
+    'x-api-key': process.env.NEXT_PUBLIC_QRNG_API_KEY,
   },
 };
-
-const api = eth;
 
 const messages = {
   quantum: 'quantum random number set acquired',
@@ -35,12 +28,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>,
 ) {
-  /*if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     res.status(200).json({
       rands: Array.from(randomBytes(1024).values()),
       message: messages.pseudo,
     });
-  }*/
+  }
   try {
     const qrnd: {
       data: {
@@ -49,11 +42,9 @@ export default async function handler(
         data: number[];
         success: boolean;
       };
-    } = await axios.get(api.endpoint, {
-      headers: {
-        'x-api-key': process.env.NEXT_PUBLIC_QRNG_API_KEY,
-      },
-      params: api.params,
+    } = await axios.get(anu.endpoint, {
+      headers: anu.headers,
+      params: anu.params,
       timeout: 2000,
     });
     res.status(200).json({

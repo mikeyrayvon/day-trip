@@ -30,7 +30,7 @@ const HomePage = () => {
     const fetchData = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (error || !data?.user) {
-        //router.push('/login');
+        router.push('/login');
       }
     };
     fetchData();
@@ -92,7 +92,7 @@ const HomePage = () => {
           {process.env.NEXT_PUBLIC_INFO_URL && (
             <a
               href={process.env.NEXT_PUBLIC_INFO_URL}
-              className="button block bg-zinc-700"
+              className="form-element block bg-zinc-700"
             >
               ?
             </a>
@@ -103,7 +103,7 @@ const HomePage = () => {
             <button
               onClick={getUserLocation}
               disabled={loading}
-              className="button bg-zinc-700"
+              className="form-element bg-zinc-700"
             >
               Start
             </button>
@@ -116,7 +116,7 @@ const HomePage = () => {
                   });
                 }}
                 disabled={loading}
-                className="button bg-zinc-700"
+                className="form-element bg-zinc-700"
               >
                 Generate
               </button>
@@ -130,7 +130,7 @@ const HomePage = () => {
               )
             }
             disabled={loading || !voidStats?.coordinate}
-            className="button bg-zinc-900"
+            className="form-element bg-zinc-900"
           >
             gMaps↗
           </button>
