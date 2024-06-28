@@ -142,7 +142,7 @@ const HomePage = () => {
           <button
             onClick={getUserLocation}
             disabled={loading}
-            className="form-element bg-zinc-700"
+            className="form-element pointer-events-auto bg-zinc-700"
           >
             Start
           </button>
