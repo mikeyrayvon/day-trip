@@ -1,7 +1,7 @@
 'use client';
 
 import { getVoid } from './utils';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Stats, LatLon } from './types';
 import Map from './map';
 import { useResizeObserver } from './hooks/useResizeObserver';
@@ -16,8 +16,25 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const logsRef = useRef<HTMLDivElement | null>(null);
   const [userLocation, setUserLocation] = useState<LatLon | undefined>();
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    process.env.NODE_ENV === 'development',
+  );
 
   useResizeObserver({ logsRef });
+
+  const fetchUserData = useCallback(async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data?.user) {
+      router.push('/login');
+    }
+    setIsAuthenticated(true);
+  }, [supabase, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      fetchUserData();
+    }
+  }, [isAuthenticated, fetchUserData]);
 
   const addLogs = (newLogs: string | string[]) => {
     setLogs((state) => [
@@ -25,16 +42,6 @@ const HomePage = () => {
       ...(Array.isArray(newLogs) ? newLogs : [newLogs]),
     ]);
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data?.user) {
-        router.push('/login');
-      }
-    };
-    fetchData();
-  }, [supabase, router]);
 
   const handleSubmit = async (radius = 1000, startLocation: LatLon) => {
     setLoading(true);
@@ -83,6 +90,10 @@ const HomePage = () => {
       );
     });
   };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <main className="fixed h-full w-full bg-zinc-700 text-white">
