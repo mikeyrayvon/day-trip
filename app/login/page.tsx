@@ -84,7 +84,6 @@ const LoginPage = () => {
             autoComplete="email"
             required
             className="form-element bg-zinc-200 text-zinc-900"
-            defaultValue="shitemail2000@gmail.com"
           />
           <label htmlFor="invite-code">Invite code:</label>
           <input
@@ -94,7 +93,6 @@ const LoginPage = () => {
             autoComplete="off"
             required
             className="form-element bg-zinc-200 text-zinc-900"
-            defaultValue="e51a26b0-5f4d-4e5c-b5b9-884ab90bb355"
           />
 
           <div className="flex flex-col items-center gap-2">
