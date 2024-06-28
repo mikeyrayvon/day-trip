@@ -1,12 +1,5 @@
 import axios from 'axios';
 import { randomBytes } from 'crypto';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { headers } from 'next/headers';
-
-type ResponseData = {
-  rands: number[];
-  message: string;
-};
 
 const anu = {
   endpoint: 'https://api.quantumnumbers.anu.edu.au',
@@ -24,14 +17,14 @@ const messages = {
   pseudo: 'pseudo random number set acquired',
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ResponseData>,
-) {
+export const GET = async () => {
+  let rands = Array.from(randomBytes(1024).values());
+  let message = messages.pseudo;
+
   if (process.env.NODE_ENV === 'development') {
-    res.status(200).json({
-      rands: Array.from(randomBytes(1024).values()),
-      message: messages.pseudo,
+    return Response.json({
+      rands,
+      message,
     });
   }
   try {
@@ -47,14 +40,15 @@ export default async function handler(
       params: anu.params,
       timeout: 2000,
     });
-    res.status(200).json({
-      rands: qrnd.data.data,
-      message: messages.quantum,
-    });
+
+    rands = qrnd.data.data;
+    message = messages.quantum;
   } catch (e: any) {
-    res.status(200).json({
-      rands: Array.from(randomBytes(1024).values()),
-      message: `error: ${e.message}. ${messages.pseudo}`,
-    });
+    message = `error: ${e.message}. ${messages.pseudo}`;
   }
-}
+
+  return Response.json({
+    rands,
+    message,
+  });
+};

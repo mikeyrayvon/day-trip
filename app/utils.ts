@@ -11,7 +11,7 @@ let message: '';
 
 async function guaranteeBuffer() {
   if (rands.length < 300) {
-    const res = await axios('api/getRands');
+    const res = await axios.get('api/getRands');
     rands = rands.concat(res.data.rands);
     message = res.data.message;
   }
