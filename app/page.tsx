@@ -98,43 +98,32 @@ const HomePage = () => {
             </a>
           )}
         </div>
-        <div className="flex gap-1">
-          {!userLocation ? (
+        {userLocation && (
+          <div className="flex gap-1">
             <button
-              onClick={getUserLocation}
+              onClick={() => {
+                getUserLocation().then((startLocation) => {
+                  handleSubmit(1000, startLocation);
+                });
+              }}
               disabled={loading}
               className="form-element bg-zinc-700"
             >
-              Start
+              Generate
             </button>
-          ) : (
-            <>
-              <button
-                onClick={() => {
-                  getUserLocation().then((startLocation) => {
-                    handleSubmit(1000, startLocation);
-                  });
-                }}
-                disabled={loading}
-                className="form-element bg-zinc-700"
-              >
-                Generate
-              </button>
-            </>
-          )}
-
-          <button
-            onClick={() =>
-              window.location.assign(
-                `https://www.google.com/maps/search/?api=1&query=${voidStats?.coordinate.lat},${voidStats?.coordinate.lon}`,
-              )
-            }
-            disabled={loading || !voidStats?.coordinate}
-            className="form-element bg-zinc-900"
-          >
-            gMaps↗
-          </button>
-        </div>
+            <button
+              onClick={() =>
+                window.location.assign(
+                  `https://www.google.com/maps/search/?api=1&query=${voidStats?.coordinate.lat},${voidStats?.coordinate.lon}`,
+                )
+              }
+              disabled={loading || !voidStats?.coordinate}
+              className="form-element bg-zinc-900"
+            >
+              gMaps↗
+            </button>
+          </div>
+        )}
       </div>
       <div
         className="absolute bottom-0 left-0 h-[20%] w-full overflow-x-hidden overflow-y-scroll"
@@ -148,6 +137,17 @@ const HomePage = () => {
           ))}
         </div>
       </div>
+      {!userLocation && (
+        <div className="pointer-events-none absolute left-0 top-0 z-50 flex h-full w-full items-center justify-center">
+          <button
+            onClick={getUserLocation}
+            disabled={loading}
+            className="form-element bg-zinc-700"
+          >
+            Start
+          </button>
+        </div>
+      )}
     </main>
   );
 };

@@ -1,45 +1,36 @@
 'use server';
 
+import { createClient } from '@/utils/supabase/server';
+import { AuthOtpResponse } from '@supabase/supabase-js';
+import axios from 'axios';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { createClient } from '@/utils/supabase/server';
+const supabase = createClient();
 
-export const login = async (formData: FormData) => {
-  const supabase = createClient();
-
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
+export const login = async (formData: FormData): Promise<AuthOtpResponse> => {
   const data = {
     email: formData.get('email') as string,
     options: {
-      // set this to false if you do not want the user to be automatically signed up
       shouldCreateUser: false,
     },
   };
 
-  const { error } = await supabase.auth.signInWithOtp(data);
+  const res = await supabase.auth.signInWithOtp(data);
 
-  if (error) {
-    redirect('/error');
-  }
+  return JSON.parse(JSON.stringify(res));
 };
 
-export const signup = async (formData: FormData) => {
-  const supabase = createClient();
-
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
+export const signup = async (formData: FormData): Promise<any> => {
   const data = {
     email: formData.get('email') as string,
-    password: formData.get('password') as string,
+    password: formData.get('invite') as string,
   };
 
   const { error } = await supabase.auth.signUp(data);
-  console.log(error);
 
   if (error) {
-    redirect('/error');
+    return { error };
   }
 
   revalidatePath('/', 'layout');
