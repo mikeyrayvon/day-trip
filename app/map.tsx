@@ -34,7 +34,7 @@ const Map = ({
   voidStats?: Stats;
 }) => {
   const [mapUrl, setMapUrl] = useState('');
-  const mapRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
     if (mapRef.current === null || !userLocation) {
@@ -61,3 +61,16 @@ const Map = ({
 };
 
 export default Map;
+
+/*
+let url = `https://www.google.com/maps/embed/v1/directions?key=${process.env.NEXT_PUBLIC_GMAPS_API_KEY}&origin=${userLocation.lat},${userLocation.lon}&destination=${voidStats?.coordinate.lat},${voidStats?.coordinate.lon}&mode=walking`;
+
+<iframe
+      ref={mapRef}
+      frameBorder="0"
+      style={{ border: 0 }}
+      referrerPolicy="no-referrer-when-downgrade"
+      src={mapUrl}
+      className="absolute h-[80%] w-full"
+    />
+*/
