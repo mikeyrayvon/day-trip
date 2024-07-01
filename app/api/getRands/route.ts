@@ -27,28 +27,29 @@ export const GET = async () => {
       message,
     });
   }
-  try {
-    const qrnd: {
-      data: {
-        type: string;
-        length: number;
-        data: number[];
-        success: boolean;
-      };
-    } = await axios.get(anu.endpoint, {
-      headers: anu.headers,
-      params: anu.params,
-      timeout: 2000,
-    });
 
-    rands = qrnd.data.data;
-    message = messages.quantum;
-  } catch (e: any) {
-    message = `error: ${e.message}. ${messages.pseudo}`;
+  const qrnd: {
+    data: {
+      type: string;
+      length: number;
+      data: number[];
+      success: boolean;
+      error: any;
+    };
+  } = await axios.get(anu.endpoint, {
+    headers: anu.headers,
+    params: anu.params,
+    timeout: 2000,
+  });
+
+  if (qrnd.data.error) {
+    return Response.json({
+      error: qrnd.data.error,
+    });
   }
 
   return Response.json({
-    rands,
-    message,
+    rands: qrnd.data.data,
+    message: messages.quantum,
   });
 };
