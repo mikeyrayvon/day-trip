@@ -21,7 +21,7 @@ export const GET = async () => {
   let rands = Array.from(randomBytes(1024).values());
   let message = messages.pseudo;
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV !== 'development') {
     return Response.json({
       rands,
       message,
