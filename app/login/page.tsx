@@ -36,6 +36,7 @@ const LoginPage = () => {
 
     if (inviteRes.data.error) {
       setSignupResult(`Error claiming invitation`);
+      return;
     }
 
     const res = await signup(formValues);
