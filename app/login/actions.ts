@@ -2,7 +2,6 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { AuthOtpResponse } from '@supabase/supabase-js';
-import axios from 'axios';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
