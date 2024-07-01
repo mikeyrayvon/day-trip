@@ -19,7 +19,6 @@ async function guaranteeBuffer() {
 
 const byteIterator = (async function* () {
   while (true) {
-    console.log(rands.length);
     await guaranteeBuffer();
     yield rands.shift();
   }
