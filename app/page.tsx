@@ -19,6 +19,7 @@ const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     process.env.NODE_ENV === 'development',
   );
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useResizeObserver({ logsRef });
 
@@ -42,6 +43,10 @@ const HomePage = () => {
       ...state,
       ...(Array.isArray(newLogs) ? newLogs : [newLogs]),
     ]);
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleSubmit = async (radius = 1000, startLocation: LatLon) => {
@@ -148,6 +153,7 @@ const HomePage = () => {
             </div>
           ))}
         </div>
+        <div ref={messagesEndRef} />
       </div>
       {!userLocation && (
         <div className="pointer-events-none absolute left-0 top-0 z-50 flex h-full w-full items-center justify-center">
