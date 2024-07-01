@@ -16,7 +16,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const logsRef = useRef<HTMLDivElement | null>(null);
   const [userLocation, setUserLocation] = useState<LatLon | undefined>();
-  const [isAuthenticated, setIsAuthenticated] = useState(
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     process.env.NODE_ENV === 'development',
   );
 
@@ -26,6 +26,7 @@ const HomePage = () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data?.user) {
       router.push('/login');
+      return;
     }
     setIsAuthenticated(true);
   }, [supabase, router]);
