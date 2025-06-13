@@ -17,30 +17,37 @@ async function guaranteeBuffer() {
   }
 }
 
-const byteIterator = (async function* () {
-  while (true) {
-    await guaranteeBuffer();
-    yield rands.shift();
-  }
-})();
-const Uint8Iterator = (async function* () {
-  const buf = new ArrayBuffer(2);
-  const view = new DataView(buf);
-
-  while (true) {
-    for (let i of [0, 1]) {
-      let x = await byteIterator.next();
-      if (x.value) {
-        view.setUint8(i, x.value);
-      }
+// Create fresh iterators for each call to avoid state corruption
+function createByteIterator() {
+  return (async function* () {
+    while (true) {
+      await guaranteeBuffer();
+      yield rands.shift();
     }
-    yield view.getUint16(0);
-  }
-})();
+  })();
+}
+
+function createUint8Iterator() {
+  return (async function* () {
+    const buf = new ArrayBuffer(2);
+    const view = new DataView(buf);
+    const byteIter = createByteIterator();
+
+    while (true) {
+      for (let i of [0, 1]) {
+        let x = await byteIter.next();
+        if (x.value) {
+          view.setUint8(i, x.value);
+        }
+      }
+      yield view.getUint16(0);
+    }
+  })();
+}
 
 export async function getRand(maxVal: number) {
   const bitsNeeded = Math.ceil(Math.log2(maxVal));
-  const iter = bitsNeeded <= 8 ? byteIterator : Uint8Iterator;
+  const iter = bitsNeeded <= 8 ? createByteIterator() : createUint8Iterator();
 
   let test;
   while (true) {
@@ -218,28 +225,38 @@ export async function* takeCoordinate(
   { lat, lon }: { lat: number; lon: number },
   radius: number,
 ): AsyncGenerator<LatLon> {
-  const latBase = lat + (radius * -1) / RADN;
-  const dLat = (lat + radius / RADN - latBase) * 1000000;
-  const lonBase =
-    lon +
-    (radius * Math.sin((270 * Math.PI) / 180)) /
-      Math.cos((lat * Math.PI) / 180) /
-      RADN;
-  const dLon =
-    (lon +
-      (radius * Math.sin((90 * Math.PI) / 180)) /
-        Math.cos((lat * Math.PI) / 180) /
-        RADN -
-      lonBase) *
-    1000000;
-
+  
+  // Calculate coordinate deltas in degrees
+  const latDelta = radius / RADN;
+  const lonDelta = radius / (Math.cos((lat * Math.PI) / 180) * RADN);
+  
+  // Create symmetric bounds
+  const latMin = lat - latDelta;
+  const latMax = lat + latDelta;
+  const lonMin = lon - lonDelta;
+  const lonMax = lon + lonDelta;
+  
+  let pointCount = 0;
+  
   while (true) {
-    let rLat = await getRand(dLat);
-    let rLon = await getRand(dLon);
-    rLat = latBase + rLat / 1000000;
-    rLon = lonBase + rLon / 1000000;
-    if (getDistance({ lat, lon }, { lat: rLat, lon: rLon }) <= radius) {
-      yield { lat: rLat, lon: rLon };
+    pointCount++;
+    
+    // Use Uint16 range (0-65535) and scale to [0,1] range
+    const latRandom = await getRand(65536); // 0 to 65535
+    const lonRandom = await getRand(65536); // 0 to 65535
+    
+    // Convert to [0,1] range
+    const latPercent = latRandom / 65535;
+    const lonPercent = lonRandom / 65535;
+    
+    // Scale to coordinate ranges
+    const finalLat = latMin + latPercent * (latMax - latMin);
+    const finalLon = lonMin + lonPercent * (lonMax - lonMin);
+    
+    const distance = getDistance({ lat, lon }, { lat: finalLat, lon: finalLon });
+    
+    if (distance <= radius) {
+      yield { lat: finalLat, lon: finalLon };
     }
   }
 }
