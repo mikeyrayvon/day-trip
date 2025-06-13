@@ -15,9 +15,9 @@ const HomePage = () => {
   const [radius, setRadius] = useState(1000);
   const logsRef = useRef<HTMLDivElement | null>(null);
   const [userLocation, setUserLocation] = useState<LatLon | undefined>();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+  /*const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     process.env.NODE_ENV === 'development',
-  );
+  );*/
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useResizeObserver({ logsRef });
@@ -101,9 +101,9 @@ const HomePage = () => {
     });
   };
 
-  if (!isAuthenticated) {
+  /*if (!isAuthenticated) {
     return null;
-  }
+  }*/
 
   return (
     <main className="fixed h-full w-full bg-zinc-700 text-white">

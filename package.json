@@ -16,7 +16,6 @@
     "@tunnel/cli": "^0.4.5",
     "appwrite": "^18.1.1",
     "axios": "^1.6.1",
-    "fatum-node": "github:mikeyrayvon/fatum-node",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "next": "14.2.4",
