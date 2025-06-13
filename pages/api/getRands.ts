@@ -1,7 +1,5 @@
 import axios from 'axios';
-import { randomBytes } from 'crypto';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { headers } from 'next/headers';
 
 type ResponseData = {
   rands: number[];
@@ -24,16 +22,25 @@ const messages = {
   pseudo: 'pseudo random number set acquired',
 };
 
+// Generate random bytes using Web Crypto API
+const generateRandomBytes = (length: number): number[] => {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array);
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>,
 ) {
-  if (process.env.NODE_ENV === 'development') {
+  /*if (process.env.NODE_ENV === 'development') {
     res.status(200).json({
-      rands: Array.from(randomBytes(1024).values()),
+      rands: generateRandomBytes(1024),
       message: messages.pseudo,
     });
-  }
+    return;
+  }*/
+  
   try {
     const qrnd: {
       data: {
@@ -47,13 +54,15 @@ export default async function handler(
       params: anu.params,
       timeout: 2000,
     });
+    
     res.status(200).json({
       rands: qrnd.data.data,
       message: messages.quantum,
     });
   } catch (e: any) {
+    console.log(e);
     res.status(200).json({
-      rands: Array.from(randomBytes(1024).values()),
+      rands: generateRandomBytes(1024),
       message: `error: ${e.message}. ${messages.pseudo}`,
     });
   }
