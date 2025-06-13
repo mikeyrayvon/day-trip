@@ -1,16 +1,14 @@
 'use client';
 
 import { getVoid } from './utils';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Stats, LatLon } from './types';
 import Map from './map';
 import { useResizeObserver } from './hooks/useResizeObserver';
-import { createClient } from '@/utils/supabase/client';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 
 const HomePage = () => {
-  const supabase = createClient();
-  const router = useRouter();
+  // const router = useRouter();
   const [voidStats, setVoidStats] = useState<Stats | undefined>();
   const [logs, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -23,7 +21,7 @@ const HomePage = () => {
 
   useResizeObserver({ logsRef });
 
-  const fetchUserData = useCallback(async () => {
+  /*const fetchUserData = useCallback(async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data?.user) {
       router.push('/login');
@@ -36,7 +34,7 @@ const HomePage = () => {
     if (!isAuthenticated) {
       fetchUserData();
     }
-  }, [isAuthenticated, fetchUserData]);
+  }, [isAuthenticated, fetchUserData]);*/
 
   const addLogs = (newLogs: string | string[]) => {
     setLogs((state) => [
@@ -49,11 +47,12 @@ const HomePage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSubmit = async (radius = 1000, startLocation: LatLon) => {
+  const handleSubmit = async (radius = 1000) => {
     setLoading(true);
     addLogs(['getting void', `radius: ${radius}`]);
+    const startLocation = await getUserLocation();
     const { stats: newVoid, message } = await getVoid(
-      startLocation ?? (userLocation as LatLon),
+      startLocation,
       radius,
     );
     addLogs([
@@ -64,6 +63,7 @@ const HomePage = () => {
       `void power: ${newVoid.power}`,
     ]);
     setVoidStats(newVoid);
+    setUserLocation(startLocation);
     setLoading(false);
   };
 
@@ -72,7 +72,6 @@ const HomePage = () => {
       return Promise.reject('Geolocation is not supported');
     }
 
-    setLoading(true);
     addLogs(['enableHighAccuracy: false', 'timeout: 5000', 'maximumAge: 0']);
 
     // Retrieve latitude & longitude coordinates from `navigator.geolocation` Web API
@@ -84,16 +83,19 @@ const HomePage = () => {
             'device acquired',
             `device latlon: ${latitude},${longitude}`,
           ]);
-          setUserLocation({ lat: latitude, lon: longitude });
-          setLoading(false);
           resolve({ lat: latitude, lon: longitude });
         },
         (e: any) => {
-          setLoading(false);
           reject(e);
         },
         { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 },
       );
+    });
+  };
+
+  const initUserLocation = () => {
+    getUserLocation().then((location) => {
+      setUserLocation(location);
     });
   };
 
@@ -119,9 +121,7 @@ const HomePage = () => {
           <div className="flex gap-1">
             <button
               onClick={() => {
-                getUserLocation().then((startLocation) => {
-                  handleSubmit(1000, startLocation);
-                });
+                handleSubmit(1000);
               }}
               disabled={loading}
               className="form-element bg-zinc-700"
@@ -158,7 +158,7 @@ const HomePage = () => {
       {!userLocation && (
         <div className="pointer-events-none absolute left-0 top-0 z-50 flex h-full w-full items-center justify-center">
           <button
-            onClick={getUserLocation}
+            onClick={initUserLocation}
             disabled={loading}
             className="form-element pointer-events-auto bg-zinc-700"
           >
