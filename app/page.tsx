@@ -1,6 +1,6 @@
 'use client';
 
-import { getVoid } from './utils';
+import { getVoid, getAttractor } from './utils';
 import { useRef, useState } from 'react';
 import { Stats, LatLon } from './types';
 import Map from './map';
@@ -12,6 +12,7 @@ const HomePage = () => {
   const [voidStats, setVoidStats] = useState<Stats | undefined>();
   const [logs, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [radius, setRadius] = useState(1000);
   const logsRef = useRef<HTMLDivElement | null>(null);
   const [userLocation, setUserLocation] = useState<LatLon | undefined>();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
@@ -47,20 +48,21 @@ const HomePage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSubmit = async (radius = 1000) => {
+  const handleSubmit = async (pattern: 'void' | 'attractor') => {
     setLoading(true);
-    addLogs(['getting void', `radius: ${radius}`]);
+    addLogs([`getting ${pattern}`, `radius: ${radius} meters`]);
     const startLocation = await getUserLocation();
-    const { stats: newVoid, message } = await getVoid(
-      startLocation,
-      radius,
-    );
+    const { stats: newVoid, message } =
+      pattern === 'void'
+        ? await getVoid(startLocation, radius)
+        : await getAttractor(startLocation, radius);
     addLogs([
       message,
-      'void acquired',
-      `void latlon: ${newVoid.coordinate.lat},${newVoid.coordinate.lon}`,
-      `void radius: ${newVoid.radius}`,
-      `void power: ${newVoid.power}`,
+      `${pattern} acquired`,
+      `${pattern} latlon: ${newVoid.coordinate.lat},${newVoid.coordinate.lon}`,
+      `average radius: ${newVoid.radius}`,
+      `${pattern} power: ${newVoid.power}`,
+      `--------------------------------`,
     ]);
     setVoidStats(newVoid);
     setUserLocation(startLocation);
@@ -119,14 +121,33 @@ const HomePage = () => {
         </div>
         {userLocation && (
           <div className="flex gap-1">
+            <select
+              value={radius}
+              onChange={(e) => setRadius(parseInt(e.target.value))}
+              className="form-element bg-zinc-700"
+            >
+              <option value="500">0.5km</option>
+              <option value="1000">1km</option>
+              <option value="2000">2km</option>
+              <option value="3000">3km</option>
+            </select>
             <button
               onClick={() => {
-                handleSubmit(1000);
+                handleSubmit('void');
               }}
               disabled={loading}
               className="form-element bg-zinc-700"
             >
-              Generate
+              Void
+            </button>
+            <button
+              onClick={() => {
+                handleSubmit('attractor');
+              }}
+              disabled={loading}
+              className="form-element bg-zinc-700"
+            >
+              Attractor
             </button>
             <button
               onClick={() =>

@@ -40,7 +40,7 @@ export default async function handler(
     });
     return;
   }*/
-  
+
   try {
     const qrnd: {
       data: {
@@ -54,7 +54,7 @@ export default async function handler(
       params: anu.params,
       timeout: 2000,
     });
-    
+
     res.status(200).json({
       rands: qrnd.data.data,
       message: messages.quantum,

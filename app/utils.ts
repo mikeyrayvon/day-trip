@@ -175,7 +175,7 @@ function getStats(
 export async function getAttractor(
   center: LatLon,
   radius: number,
-): Promise<Stats> {
+): Promise<{ stats: Stats; message: string }> {
   const fullBag = await fillPointsBag(center, radius);
   let avgCoord: LatLon = center,
     rd = radius,
@@ -192,7 +192,8 @@ export async function getAttractor(
     });
   }
 
-  return getStats(avgCoord, fullBag, radius);
+  const stats = getStats(avgCoord, fullBag, radius);
+  return { stats: { ...stats, ...{ power: 1 / stats.power } }, message };
 }
 
 export async function getVoid(
@@ -225,36 +226,38 @@ export async function* takeCoordinate(
   { lat, lon }: { lat: number; lon: number },
   radius: number,
 ): AsyncGenerator<LatLon> {
-  
   // Calculate coordinate deltas in degrees
   const latDelta = radius / RADN;
   const lonDelta = radius / (Math.cos((lat * Math.PI) / 180) * RADN);
-  
+
   // Create symmetric bounds
   const latMin = lat - latDelta;
   const latMax = lat + latDelta;
   const lonMin = lon - lonDelta;
   const lonMax = lon + lonDelta;
-  
+
   let pointCount = 0;
-  
+
   while (true) {
     pointCount++;
-    
+
     // Use Uint16 range (0-65535) and scale to [0,1] range
     const latRandom = await getRand(65536); // 0 to 65535
     const lonRandom = await getRand(65536); // 0 to 65535
-    
+
     // Convert to [0,1] range
     const latPercent = latRandom / 65535;
     const lonPercent = lonRandom / 65535;
-    
+
     // Scale to coordinate ranges
     const finalLat = latMin + latPercent * (latMax - latMin);
     const finalLon = lonMin + lonPercent * (lonMax - lonMin);
-    
-    const distance = getDistance({ lat, lon }, { lat: finalLat, lon: finalLon });
-    
+
+    const distance = getDistance(
+      { lat, lon },
+      { lat: finalLat, lon: finalLon },
+    );
+
     if (distance <= radius) {
       yield { lat: finalLat, lon: finalLon };
     }
