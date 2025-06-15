@@ -1,0 +1,12 @@
+{
+  "name": "day-trip-functions",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "appwrite functions dev",
+    "deploy": "appwrite functions deploy"
+  },
+  "dependencies": {
+    "appwrite": "^18.1.1"
+  }
+}
